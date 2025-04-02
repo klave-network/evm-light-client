@@ -40,7 +40,7 @@ pub fn is_valid_merkle_branch(
     }
     let mut value = leaf;
     for (i, b) in branch.iter().enumerate() {
-        klave::notifier::send_string(&format!("Iterating over branch: {}, {:?}", i, b));
+        // klave::notifier::send_string(&format!("Iterating over branch: {}, {:?}", i, b));
         if let Some(v) = 2u32.checked_pow(i as u32) {
             if subtree_index / v % 2 == 1 {
                 value = hash([b.as_bytes(), value.as_bytes()].concat());
@@ -58,7 +58,7 @@ pub fn is_valid_merkle_branch(
         }
     }
     if value == root {
-        klave::notifier::send_string(&format!("Merkle branch is valid for leaf: {:?}", leaf));
+        // klave::notifier::send_string(&format!("Merkle branch is valid for leaf: {:?}", leaf));
         Ok(())
     } else {
         Err(MerkleError::InvalidMerkleBranch(

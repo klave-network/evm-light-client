@@ -14,6 +14,17 @@ To build and use this template, ensure the following tools are installed:
 - **Cargo Component**: Install via `cargo install cargo-component`
 - **WASM Target**: Add the target with `rustup target add wasm32-unknown-unknown`
 
+## Rust Libraries used
+
+In this template, the following libraries are leveraged:
+- Ethereum Light Client RS from DataChainLab (https://github.com/datachainlab/ethereum-light-client-rs)
+- Milagro BLS from DataChainLab (https://github.com/datachainlab/milagro_bls)
+- Ssz RS (https://github.com/bluele/ssz_rs)
+- Patricia Merkle Trie (https://github.com/bluele/patricia-merkle-trie)
+- RS Merkle (https://crates.io/crates/rs_merkle)
+- rlp (https://crates.io/crates/rlp)
+- etc.. (check https://github.com/klave-network/evm-light-client/blob/main/apps/evm-light-client/Cargo.toml)
+
 ## Wasm Component
 
 Klave applications are built as WebAssembly (WASM) components. The following methods are implemented and exposed in the `evm-light-client` component:

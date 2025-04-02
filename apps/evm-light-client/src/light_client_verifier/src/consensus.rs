@@ -42,14 +42,14 @@ impl<const SYNC_COMMITTEE_SIZE: usize, ST: LightClientStoreReader<SYNC_COMMITTEE
                 return Err(Error::TrustedRootMismatch(trusted_block_root, root));
             }
         }
-        let _fork_spec = ctx.compute_fork_spec(bootstrap.beacon_header().slot);
-        // is_valid_normalized_merkle_branch(
-        //     hash_tree_root(bootstrap.current_sync_committee().clone())?,
-        //     &bootstrap.current_sync_committee_branch(),
-        //     fork_spec.current_sync_committee_gindex,
-        //     bootstrap.beacon_header().state_root,
-        // )
-        // .map_err(Error::InvalidCurrentSyncCommitteeMerkleBranch)?;
+        let fork_spec = ctx.compute_fork_spec(bootstrap.beacon_header().slot);
+        is_valid_normalized_merkle_branch(
+            hash_tree_root(bootstrap.current_sync_committee().clone())?,
+            &bootstrap.current_sync_committee_branch(),
+            fork_spec.current_sync_committee_gindex,
+            bootstrap.beacon_header().state_root,
+        )
+        .map_err(Error::InvalidCurrentSyncCommitteeMerkleBranch)?;
         Ok(())
     }
 

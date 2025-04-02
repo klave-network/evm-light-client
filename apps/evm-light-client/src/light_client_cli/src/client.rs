@@ -79,9 +79,16 @@ impl<
         let bootstrap: LightClientBootstrapInfo<SYNC_COMMITTEE_SIZE, BYTES_PER_LOGS_BLOOM, MAX_EXTRA_DATA_BYTES> = self.chain.get_bootstrap(trusted_block_root).unwrap();
 
         let vctx = self.build_verification_context();
-        self.verifier
-            .validate_boostrap(&vctx, &bootstrap, trusted_block_root)?;
-
+        match self.verifier
+            .validate_boostrap(&vctx, &bootstrap, trusted_block_root) {
+            Ok(_) => (),
+            Err(e) => {
+                klave::notifier::send_string(&format!("failed to validate bootstrap: {:?}, {:?}, {:?}", bootstrap, SYNC_COMMITTEE_SIZE, e));
+                return Err(Error::Other {
+                    description: "failed to validate bootstrap".into(),
+                });
+            }
+        };
         let state = LightClientStore::from_bootstrap(
             bootstrap.clone().0,
             bootstrap.header.execution.clone(),
