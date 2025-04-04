@@ -24,24 +24,31 @@ impl PersistCommand {
         ctx: Context<BYTES_PER_LOGS_BLOOM, MAX_EXTRA_DATA_BYTES, SYNC_COMMITTEE_SIZE>
     ) -> Result<()> {
         let chain = Chain::new(ctx.beacon_endpoint());
-        let genesis_info = match self.genesis_info {
-            Some(genesis_info) => match serde_json::from_str::<GenesisData>(&genesis_info) {
-                Ok(genesis) => genesis,
-                Err(e) => {
-                    println!("Invalid genesis info: {}", e);
-                    return Ok(());
+
+        let genesis = match ctx.get_genesis() {
+            Ok(genesis) => genesis,
+            Err(e) => {
+                match self.genesis_info {
+                    Some(genesis_info) => match serde_json::from_str::<GenesisData>(&genesis_info) {
+                        Ok(genesis) => genesis,
+                        Err(e) => {
+                            klave::notifier::send_string(&format!("Invalid genesis info: {}", e));
+                            return Ok(());
+                        }
+                    },
+                    None => {
+                        klave::notifier::send_string(&format!("Missing genesis info: {}", e));
+                        return Ok(());
+                    }
                 }
-            },
-            None => {
-                println!("Genesis info is required");                
-                return Ok(());
             }
         };
+
         let lc = LightClient::new(
             ctx,
             chain,            
-            genesis_info.genesis_time,
-            genesis_info.genesis_validators_root,
+            genesis.genesis_time,
+            genesis.genesis_validators_root,
             None,
         );
 
@@ -49,7 +56,7 @@ impl PersistCommand {
             Some(bootstrap_info) => lc.store_boostrap(match serde_json::from_str(&bootstrap_info) {
                 Ok(bootstrap) => bootstrap,
                 Err(e) => {
-                    eprintln!("Invalid bootstrap info: {}", e);
+                    klave::notifier::send_string(&format!("Invalid bootstrap info: {}", e));
                     return Ok(());
                 }
             }),
@@ -65,7 +72,7 @@ impl PersistCommand {
             }),
             None => Ok(()),
         };
-        lc.store_genesis(&genesis_info)?;
+        lc.store_genesis(&genesis)?;
         klave::notifier::send_string("Light client genesis, boostrap and state info persisted");
         Ok(())
     }
