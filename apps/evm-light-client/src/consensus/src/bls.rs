@@ -219,7 +219,7 @@ pub fn is_equal_pubkeys_and_aggregate_pub_key<const SYNC_COMMITTEE_SIZE: usize>(
         .collect();
     let agg_pubkey: PublicKey = aggregate_public_key(&pubkeys)?.into();
     if aggregate_pubkey == &agg_pubkey {
-        klave::notifier::send_string(&format!("Aggregate public key is equal to the aggregate of the public keys"));
+        // klave::notifier::send_string(&format!("Aggregate public key is equal to the aggregate of the public keys"));
         Ok(())
     } else {
         Err(Error::BLSAggregatePublicKeyMismatch(
